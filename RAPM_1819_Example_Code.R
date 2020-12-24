@@ -3,11 +3,11 @@
 library(tidyverse)
 library(glmnet)
 
-### DONT WORRY ABOUT THIS - IT JUST CHANGES THE NUMBER OF DIGITS DISPLAYED AND MAKES THINGS NEATER ###
+### DON'T WORRY ABOUT THIS - IT JUST CHANGES THE NUMBER OF DIGITS DISPLAYED AND MAKES THINGS NEATER ###
 
 options(scipen=999, digits = 2)
 
-### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. YOU SHOULD RUN WITH THE SMALL CSV FIRST ###
+### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. YOU MAY WANT TO RUN WITH THE SMALL CSV FIRST ###
 
 #all1819 <- read.csv("All_Events_1819_With_EV_xG.csv", fileEncoding = "UTF-8-BOM")
 
@@ -25,18 +25,16 @@ empty_net <- c("5vE", "Ev5", "4vE", "Ev4", "3vE", "Ev3")
 meaningful_events <- c("FAC", "GOAL", "BLOCK", "SHOT", "MISS", "HIT", "TAKE", "GIVE", "CHANGE")
 stoppages <- c("PGSTR", "PGEND", "ANTHEM", "PSTR", "FAC", "GOAL", "STOP", "PENL", "PEND", "CHL", "GEND", "GOFF", "EISTR", "EIEND", "EGT", "EGPID")
 
-"%ni%" <- Negate("%in%")
-
 ### CREATE BACKUP IF ERRORS OCCUR - CAN RETURN TO ORIGINAL WITHOUT LOADING ANOTHER CSV ###
 
 backup <- all1819
 
 ### IF YOU WANT TO MAKE THINGS SMALLER, YOU CAN FILTER FROM YOUR BACKUP TO ONLY TAKE A SMALL SAMPLE ###
 
-### I COMMENTED IT OUT, BUT YOU CAN REMOVE THOSE COMMENTS AND FILTER ONLY THE FIRST 100 GAMES ###
+### I COMMENTED IT OUT, BUT IF YOU REMOVE THOSE COMMENTS YOU WILL FILTER ONLY THE FIRST 100 GAMES ###
 
-all1819 <- backup %>%
-  filter(game_id<2018020101)
+#all1819 <- backup %>%
+  #filter(game_id<2018020101)
 
 ### ADD BACK TO BACKS ###
 
@@ -65,28 +63,6 @@ all1819$Away_BTB <- ifelse((all1819$Away_Home_Yesterday==1 | all1819$Away_Away_Y
 
 all1819 <- all1819 %>%
   filter(game_period < 5)
-
-### ADD PRIORS ###
-
-all1819$last_event_type <-  lag(all1819$event_type)
-all1819$last_strength_state <- lag(all1819$game_strength_state)
-all1819$two_events_ago <- lag(lag(all1819$event_type))
-all1819$two_strengths_ago <- lag(lag(all1819$game_strength_state))
-all1819$three_events_ago <- lag(lag(lag(all1819$event_type)))
-all1819$three_strengths_ago <- lag(lag(lag(all1819$game_strength_state)))
-all1819$four_events_ago <- lag(lag(lag(lag(all1819$event_type))))
-all1819$four_strengths_ago <- lag(lag(lag(lag(all1819$game_strength_state))))
-all1819$seconds_last <- lag(all1819$game_seconds)
-all1819$seconds_second_last <- lag(lag(all1819$game_seconds))
-all1819$seconds_third_last <- lag(lag(lag(all1819$game_seconds)))
-all1819$seconds_fourth_last <- lag(lag(lag(lag(all1819$game_seconds))))
-all1819$seconds_since_last <- all1819$game_seconds - lag(all1819$game_seconds)
-all1819$seconds_since_second_last <- all1819$game_seconds - lag(lag(all1819$game_seconds))
-all1819$seconds_since_third_last <- all1819$game_seconds - lag(lag(lag(all1819$game_seconds)))
-all1819$seconds_since_fourth_last <- all1819$game_seconds - lag(lag(lag(lag(all1819$game_seconds))))
-all1819$next_event_type <- lead(all1819$event_type)
-all1819$next_strength_state <- lead(all1819$game_strength_state)
-all1819$next_seconds <- lead(all1819$game_seconds)
 
 ### CONVERT NAs TO "MISSING PLAYER" ###
 
@@ -140,8 +116,6 @@ all1819$away_pp_expiry[is.na(all1819$away_pp_expiry)] <- 0
 
 ### ADD IMPORTANT CONTEXT TO PBP DATA ###
 
-all1819$is_rebound <- ifelse(all1819$event_type %in% fenwick & lag(all1819$event_type) %in% fenwick & (all1819$game_seconds-lag(all1819$game_seconds) < 3), 1, 0)
-all1819$event_against <- ifelse(all1819$event_team==all1819$home_team, all1819$away_team, all1819$home_team)
 all1819$event_zone <- ifelse(all1819$event_zone=="Def" & all1819$event_type=="BLOCK", "Off", all1819$event_zone)
 all1819$home_zone <- ifelse(all1819$event_team==all1819$home_team, all1819$event_zone, NA)
 all1819$home_zone <- ifelse(all1819$event_team==all1819$away_team & all1819$event_zone=="Off", "Def", all1819$home_zone)
@@ -155,8 +129,6 @@ all1819$home_ozs <- ifelse((all1819$event_type=="FAC" & all1819$home_zone=="Off"
     (all1819$game_seconds==lag(lag(lag(all1819$game_seconds))) & lag(lag(lag(all1819$shift_change)))==1) |
     (all1819$game_seconds==lag(lag(lag(lag(all1819$game_seconds)))) & lag(lag(lag(lag(all1819$shift_change))))==1)
 ), 1, 0)
-
-sum(all1819$home_ozs)
 
 all1819$away_ozs <- ifelse((all1819$event_type=="FAC" & all1819$home_zone=="Def") & (
   (all1819$shift_change==1) | 
@@ -214,12 +186,6 @@ shifts_grouped <- all1819ev %>%
             State_5v5 = max(Five), State_4v4 = max(Four), State_3v3 = max(Three), Period_1 = max(period_1), Period_2 = max(period_2), Period_3 = max(period_3),
             Home_BTB = max(Home_BTB), Away_BTB = max(Away_BTB), Home_PPx = max(home_pp_expiry), Away_PPx = max(away_pp_expiry)) %>%
   filter(shift_length > 0)
-
-Couturier_Shifts <- shifts_grouped %>%
-  filter(home_on_1=="SEAN.COUTURIER" | home_on_2=="SEAN.COUTURIER" | home_on_3=="SEAN.COUTURIER" | home_on_4=="SEAN.COUTURIER" | home_on_5=="SEAN.COUTURIER" | home_on_6=="SEAN.COUTURIER" | 
-           away_on_1=="SEAN.COUTURIER" | away_on_2=="SEAN.COUTURIER" | away_on_3=="SEAN.COUTURIER" | away_on_4=="SEAN.COUTURIER" | away_on_5=="SEAN.COUTURIER" | away_on_6=="SEAN.COUTURIER" )
-
-mean(Couturier_Shifts$shift_length)
 
 ### BUILD SHIFTS FROM THE PERSPECTIVE OF OFFENSE AS HOME ###
 
@@ -282,12 +248,6 @@ away_offense_all$defense_5 <- ifelse(away_offense_all$defense_goalie==away_offen
 away_offense_all$defense_6 <- ifelse(away_offense_all$defense_goalie==away_offense_all$defense_6, "GOALIE.GUY", away_offense_all$defense_6)
 
 combined_shifts <- full_join(home_offense_all, away_offense_all)
-
-Couturier_Shifts <- combined_shifts %>%
-  filter(offense_1=="SEAN.COUTURIER" | offense_2=="SEAN.COUTURIER" | offense_3=="SEAN.COUTURIER" | offense_4=="SEAN.COUTURIER" | offense_5=="SEAN.COUTURIER" | offense_6=="SEAN.COUTURIER" | 
-           defense_1=="SEAN.COUTURIER" | defense_2=="SEAN.COUTURIER" | defense_3=="SEAN.COUTURIER" | defense_4=="SEAN.COUTURIER" | defense_5=="SEAN.COUTURIER" | defense_6=="SEAN.COUTURIER" )
-
-sum(Couturier_Shifts$shift_length)/950
 
 ### REMOVE DUMMY VARIABLES THAT WE WILL NOT BE USING ###
 
