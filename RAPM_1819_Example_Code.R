@@ -7,9 +7,11 @@ library(glmnet)
 
 options(scipen=999, digits = 2)
 
-### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. YOU MAY WANT TO RUN WITH THE SMALL CSV FIRST ###
+### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. SMALL CSV IS AVAILABLE THROUGH GITHUB; LARGE CSV MUST BE ACQUIRED THROUGH GOOGLE DOCS ###
 
-#all1819 <- read.csv("All_Events_1819_With_EV_xG.csv", fileEncoding = "UTF-8-BOM")
+### LARGE CSV LINK: https://drive.google.com/file/d/17sYWaKVNh4e0-LYleM51nmgHMQdRe7wg/view?usp=sharing ###
+
+#all1819 <- read.csv("All_Events_1819_With_EV_PP_xG.csv", fileEncoding = "UTF-8-BOM") ###
 
 all1819 <- read.csv("Small_Events_1819_With_EV_xG.csv", fileEncoding = "UTF-8-BOM")
 
