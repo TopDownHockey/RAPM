@@ -171,9 +171,6 @@ all1819$period_3 <- ifelse(all1819$game_period=="3", 1, 0)
 all1819$Home_BTB[is.na(all1819$Home_BTB)] <- 0
 all1819$Away_BTB[is.na(all1819$Away_BTB)] <- 0
 
-look <- all1819 %>%
-  filter(all1819$away_ozs==1 | lag(all1819$away_ozs)==1 | lead(all1819$away_ozs)==1)
-
 all1819ev <- all1819 %>%
   filter(game_strength_state %in% even_strength)
 
