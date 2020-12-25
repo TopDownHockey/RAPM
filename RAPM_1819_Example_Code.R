@@ -1,3 +1,9 @@
+### THERE ARE TWO CSV FILES THAT YOU CAN USE FOR THIS. THE FIRST IS THE "SMALL EVENTS" FILE WHICH IS INCLUDED IN THE RAPM REPOSITORY WHICH INCLUDES THE FIRST 100 GAMES. ###
+
+### THE SECOND FILE IS "ALL EVENTS" WHICH YOU CAN ACCESS THROUGH THIS GOOGLE DRIVE: https://drive.google.com/file/d/1dGRizxZRhm92COlmEaJbvwFKqJbbwDqn/view?usp=sharing ###
+
+### I RECOMMEND RUNNING THE REGRESSION WITH THIS FILE FIRST IN ORDER TO ENSURE THAT YOUR COMPUTER CAN HANDLE THE DATA SET. I HAVE NOT TESTED THIS ON ANY COMPUTER BESIDE MY OWN. ###
+
 ### LOAD IN TIDYVERSE, GLMNET, MATRIX, AND NECESSARY FILES ###
 
 library(tidyverse)
@@ -7,13 +13,11 @@ library(glmnet)
 
 options(scipen=999, digits = 2)
 
-### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. SMALL CSV IS AVAILABLE THROUGH GITHUB; LARGE CSV MUST BE ACQUIRED THROUGH GOOGLE DOCS ###
+### THE FIRST ONE IS THE BIG CSV, THE SECOND IS THE SMALL CSV. ###
 
-### LARGE CSV LINK: https://drive.google.com/file/d/1dGRizxZRhm92COlmEaJbvwFKqJbbwDqn/view?usp=sharing ###
+#all1819 <- read.csv("All_Events_1819_With_EV_PP_xG.csv", fileEncoding = "UTF-8-BOM") ###
 
-all1819 <- read.csv("All_Events_1819_With_EV_PP_xG.csv", fileEncoding = "UTF-8-BOM") ###
-
-#all1819 <- read.csv("Small_Events_1819_With_EV_xG.csv", fileEncoding = "UTF-8-BOM")
+all1819 <- read.csv("Small_Events_1819_With_EV_xG.csv", fileEncoding = "UTF-8-BOM")
 
 ### ADD IN YOUR EVENTS ###
 
